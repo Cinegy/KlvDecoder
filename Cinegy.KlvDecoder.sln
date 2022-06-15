@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32421.90
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cinegy.Klv", "Cinegy.KlvDecoder\Cinegy.Klv.csproj", "{5926BFCB-D399-4E8A-8806-5A8FAD0EEB84}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cinegy.Klv", "Cinegy.KlvDecoder\Cinegy.KlvDecoder.csproj", "{5926BFCB-D399-4E8A-8806-5A8FAD0EEB84}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cinegy.KlvDecoder.Tests", "Cinegy.KlvDecoder.Tests\Cinegy.KlvDecoder.Tests.csproj", "{118F1E30-2F53-4703-9674-007F242499AF}"
 EndProject
