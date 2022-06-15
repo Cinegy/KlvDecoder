@@ -10,4 +10,16 @@ For example, you can use it to debug / view into the guts of an MXF file (the be
 
 You can print live KLV decoding, and you can use the tool to generate input logs for 'big data' analysis (which is very cool).
 
-See all of this in action inside the Cinegy TS Analyser tool here: [GitHub] [https://github.com/cinegy/tsanalyser]
+## Getting the library
+
+Just to make your life easier, we auto-build this using AppVeyor and push to NuGet - here is how we are doing right now: 
+
+[![Build status](https://ci.appveyor.com/api/projects/status/eoveo4ndhdk66nhh?svg=true)](https://ci.appveyor.com/project/cinegy/klvdecoder)
+
+You can check out the latest compiled binary from the master or pre-master code here:
+
+[AppVeyor KlvDecoder Project Builder](https://ci.appveyor.com/project/cinegy/klvdecoder/build/artifacts)
+
+Available on NuGet here:
+
+[NuGet](https://www.nuget.org/packages/Cinegy.KlvDecoder/)
