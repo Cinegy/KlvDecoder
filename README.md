@@ -22,4 +22,4 @@ You can check out the latest compiled binary from the master or pre-master code 
 
 Available on NuGet here:
 
-[NuGet](https://www.nuget.org/packages/Cinegy.Klv/)
+[NuGet](https://www.nuget.org/packages/Cinegy.KlvDecoder/)

@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Cinegy.KlvDecoder\Cinegy.Klv.csproj" />
+    <ProjectReference Include="..\Cinegy.KlvDecoder\Cinegy.KlvDecoder.csproj" />
   </ItemGroup>
 
 
