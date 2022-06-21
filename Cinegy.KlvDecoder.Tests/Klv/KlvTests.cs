@@ -1,6 +1,6 @@
 ﻿using System;
-using Cinegy.Klv;
-using Cinegy.Klv.Entities;
+using Cinegy.KlvDecoder;
+using Cinegy.KlvDecoder.Entities;
 using NUnit.Framework;
 
 namespace Cinegy.KlvDecoder.Tests.Klv
