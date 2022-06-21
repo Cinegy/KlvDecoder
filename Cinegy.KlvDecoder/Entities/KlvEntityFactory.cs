@@ -1,15 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using Cinegy.KlvDecoder.TransportStream;
 using Cinegy.TsDecoder.TransportStream;
 
-namespace Cinegy.Klv.Entities
+namespace Cinegy.KlvDecoder.Entities
 {
-    public static class KlvEntityFactory
+    public class KlvEntityFactory
     {
-        public static List<KlvEntity> GetEntitiesFromPes(Pes pes, PesHdr tsPacketPesHeader)
+        private readonly MetadataAccessUnitFactory _accessUnitFactory = new MetadataAccessUnitFactory();
+
+        public KlvEntityFactory()
+        {
+            _accessUnitFactory.MetadataReady += _accessUnitFactory_MetadataReady;
+        }
+
+
+        public void AddPes(Pes pes, PesHdr tsPacketPesHeader)
         {   
-            if (pes.PacketStartCodePrefix != Pes.DefaultPacketStartCodePrefix || pes.StreamId != (byte)PesStreamTypes.PrivateStream1 ||
-                pes.PesPacketLength <= 0) return null;
+            if (pes.PacketStartCodePrefix != Pes.DefaultPacketStartCodePrefix ||
+                pes.PesPacketLength <= 0) return;
 
             const ushort klvMinimumSize = 6;
             var startOfKlvData = klvMinimumSize;
@@ -23,7 +32,16 @@ namespace Cinegy.Klv.Entities
             
             Buffer.BlockCopy(pes.Data, startOfKlvData, dataBuf, 0, dataBuf.Length);
 
-            return GetEntitiesFromData(dataBuf);
+            if (pes.StreamId == 0xFC)
+            {
+                //this is metadata framed within Metadata Access Units - see IEC13818 2.12.4
+                _accessUnitFactory.AddData(dataBuf);
+            }
+            else
+            {
+                var entities = GetEntitiesFromData(dataBuf);
+                OnKlvReady(entities);
+            }
         }
         
         public static List<KlvEntity> GetEntitiesFromData(byte[] sourceData)
@@ -52,6 +70,19 @@ namespace Cinegy.Klv.Entities
             }
 
             return metadataList;
+        }
+        
+        public event KlvEntitiesReadyEventHandler KlvEntitiesReady;
+        
+        private void OnKlvReady(List<KlvEntity> klvEntities)
+        {
+            KlvEntitiesReady?.Invoke(this, new KlvEntityReadyEventArgs(klvEntities));
+        }
+
+        private void _accessUnitFactory_MetadataReady(object sender, MetadataAccessDataEventArgs args)
+        {
+            var entities = GetEntitiesFromData(args.AccessUnit.Data);
+            OnKlvReady(entities);
         }
     }
 }

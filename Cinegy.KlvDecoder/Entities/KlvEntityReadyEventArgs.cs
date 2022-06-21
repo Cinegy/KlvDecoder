@@ -16,15 +16,17 @@
 using System;
 using System.Collections.Generic;
 
-namespace Cinegy.Klv.Entities
+namespace Cinegy.KlvDecoder.Entities
 {
+    public delegate void KlvEntitiesReadyEventHandler(object sender, KlvEntityReadyEventArgs args);
+
     public class KlvEntityReadyEventArgs : EventArgs
     {
         public List<KlvEntity> EntityList { get; set; }
 
-        public KlvEntityReadyEventArgs(List<KlvEntity> entity)
+        public KlvEntityReadyEventArgs(List<KlvEntity> entities)
         {
-            EntityList = entity;
+            EntityList = entities;
         }
     }
 }

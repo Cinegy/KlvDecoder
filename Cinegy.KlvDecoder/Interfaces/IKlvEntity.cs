@@ -1,4 +1,4 @@
-﻿namespace Cinegy.Klv.Interfaces
+﻿namespace Cinegy.KlvDecoder.Interfaces
 {
     public interface IKlvEntity
     {

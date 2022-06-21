@@ -16,7 +16,7 @@
 using System;
 using Cinegy.TsDecoder.TransportStream;
 
-namespace Cinegy.Klv.TransportStream
+namespace Cinegy.KlvDecoder.TransportStream
 {
     public class KlvTsDecoder
     {
@@ -26,7 +26,7 @@ namespace Cinegy.Klv.TransportStream
         
         public KlvTsService TsService { get; set; } = new KlvTsService();
 
-        public RegistrationDescriptor CurrentKlvDescriptor { get; private set; }
+        public Descriptor CurrentKlvDescriptor { get; private set; }
 
         /// <summary>
         /// The Program Number of the service that is used as source for KLV data - can be set by constructor only, otherwise default program will be used.
@@ -46,7 +46,7 @@ namespace Cinegy.Klv.TransportStream
             ProgramNumber = programNumber;
         }
 
-        public bool FindKlvService(TsDecoder.TransportStream.TsDecoder tsDecoder, out EsInfo esStreamInfo, out RegistrationDescriptor klvDescriptor)
+        public bool FindKlvService(TsDecoder.TransportStream.TsDecoder tsDecoder, out EsInfo esStreamInfo, out Descriptor klvDescriptor)
         {
             if (tsDecoder == null) throw new InvalidOperationException("Null reference to TS Decoder");
 
@@ -70,7 +70,7 @@ namespace Cinegy.Klv.TransportStream
 
                 esStreamInfo = tsDecoder.GetEsStreamForProgramNumberByTag(ProgramNumber, StreamType, DescriptorTag);
                 
-                klvDescriptor = tsDecoder.GetDescriptorForProgramNumberByTag<RegistrationDescriptor>(ProgramNumber, StreamType, DescriptorTag, true);
+                klvDescriptor = tsDecoder.GetDescriptorForProgramNumberByTag<Descriptor>(ProgramNumber, StreamType, DescriptorTag, true);
                 
                 return klvDescriptor != null;
             }
@@ -84,7 +84,7 @@ namespace Cinegy.Klv.TransportStream
             }
         }
 
-        public void Setup(RegistrationDescriptor klvDescriptor, short klvPid)
+        public void Setup(Descriptor klvDescriptor, short klvPid)
         {
             CurrentKlvDescriptor = klvDescriptor;
 

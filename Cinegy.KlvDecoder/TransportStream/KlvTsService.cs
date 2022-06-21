@@ -12,14 +12,27 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 */
+
 using System.Collections.Generic;
-using Cinegy.Klv.Entities;
+using Cinegy.KlvDecoder.Entities;
 using Cinegy.TsDecoder.TransportStream;
 
-namespace Cinegy.Klv.TransportStream
+namespace Cinegy.KlvDecoder.TransportStream
 {
     public class KlvTsService
     {
+        private readonly KlvEntityFactory _klvEntityFactory = new KlvEntityFactory();
+
+        public KlvTsService()
+        {
+            _klvEntityFactory.KlvEntitiesReady  += KlvEntityFactoryOnKlvEntitiesReady;
+        }
+
+        private void KlvEntityFactoryOnKlvEntitiesReady(object sender, KlvEntityReadyEventArgs args)
+        {
+             OnKlvEntitiesReady(args.EntityList);
+        }
+        
         /// <summary>
         /// Reference PTS, used to calculate and display relative time offsets for data within stream
         /// </summary>
@@ -36,21 +49,17 @@ namespace Cinegy.Klv.TransportStream
         public ushort ProgramNumber { get; set; } = 0;
 
         /// <summary>
-        /// The associated RegistrationDescriptor for the service, if any
+        /// The associated Descriptor for the service, if any
         /// </summary>
-        public RegistrationDescriptor AssociatedDescriptor { get; set; }
+        public Descriptor AssociatedDescriptor { get; set; }
  
         public void AddData(Pes pes, PesHdr tsPacketPesHeader)
         {
             //update / store any reference PTS for displaying easy relative values
             if (ReferencePts == 0) ReferencePts = tsPacketPesHeader.Pts;
             if (ReferencePts > 0 && tsPacketPesHeader.Pts < ReferencePts) ReferencePts = tsPacketPesHeader.Pts;
-
-            var klvEntities = KlvEntityFactory.GetEntitiesFromPes(pes, tsPacketPesHeader);
             
-            if (klvEntities == null) return;
-
-            OnKlvEntitiesReady(klvEntities);
+            _klvEntityFactory.AddPes(pes, tsPacketPesHeader);
             
         }
         
@@ -60,8 +69,5 @@ namespace Cinegy.Klv.TransportStream
         {
             KlvEntitiesReady?.Invoke(this, new KlvEntityReadyEventArgs(metadata));
         }
-
     }
-
-    public delegate void KlvEntitiesReadyEventHandler(object sender, KlvEntityReadyEventArgs args);
 }

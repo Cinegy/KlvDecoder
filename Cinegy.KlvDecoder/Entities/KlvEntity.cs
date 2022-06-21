@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Linq;
-using Cinegy.Klv.Interfaces;
-using System.Text.Json;
 using System.Text.Json.Serialization;
+using Cinegy.KlvDecoder.Interfaces;
 
-namespace Cinegy.Klv.Entities
+namespace Cinegy.KlvDecoder.Entities
 {
     public abstract class KlvEntity : IKlvEntity
     {
