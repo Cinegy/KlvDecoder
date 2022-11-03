@@ -21,10 +21,11 @@ namespace Cinegy.KlvDecoder.TransportStream
 {
     public class KlvTsService
     {
-        private readonly KlvEntityFactory _klvEntityFactory = new KlvEntityFactory();
+        private readonly KlvEntityFactory _klvEntityFactory;
 
-        public KlvTsService()
+        public KlvTsService(bool preserveSourceData = false)
         {
+            _klvEntityFactory = new KlvEntityFactory(preserveSourceData);
             _klvEntityFactory.KlvEntitiesReady  += KlvEntityFactoryOnKlvEntitiesReady;
         }
 

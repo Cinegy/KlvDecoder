@@ -8,13 +8,14 @@ namespace Cinegy.KlvDecoder.Entities
     public class KlvEntityFactory
     {
         private readonly MetadataAccessUnitFactory _accessUnitFactory = new MetadataAccessUnitFactory();
+        private readonly bool _preserveSourceData = false;
 
-        public KlvEntityFactory()
+        public KlvEntityFactory(bool preserveSourceData = false)
         {
+            _preserveSourceData = preserveSourceData;
             _accessUnitFactory.MetadataReady += _accessUnitFactory_MetadataReady;
         }
-
-
+        
         public void AddPes(Pes pes, PesHdr tsPacketPesHeader)
         {   
             if (pes.PacketStartCodePrefix != Pes.DefaultPacketStartCodePrefix ||
@@ -39,18 +40,18 @@ namespace Cinegy.KlvDecoder.Entities
             }
             else
             {
-                var entities = GetEntitiesFromData(dataBuf);
+                var entities = GetEntitiesFromData(dataBuf, _preserveSourceData);
                 OnKlvReady(entities);
             }
         }
         
-        public static List<KlvEntity> GetEntitiesFromData(byte[] sourceData)
+        public static List<KlvEntity> GetEntitiesFromData(byte[] sourceData, bool preserveSourceData = false)
         {
             var klvMetadataList = new List<KlvEntity>();
             var sourceDataPos = 0;
             while (sourceDataPos < sourceData.Length)
             {
-                var klvMetadata = new UniversalLabelKlvEntity(sourceData, sourceDataPos);
+                var klvMetadata = new UniversalLabelKlvEntity(sourceData, sourceDataPos, preserveSourceData);
                 sourceDataPos += klvMetadata.ReadBytes;
                 klvMetadataList.Add(klvMetadata);
             }
@@ -81,7 +82,7 @@ namespace Cinegy.KlvDecoder.Entities
 
         private void _accessUnitFactory_MetadataReady(object sender, MetadataAccessDataEventArgs args)
         {
-            var entities = GetEntitiesFromData(args.AccessUnit.Data);
+            var entities = GetEntitiesFromData(args.AccessUnit.Data, _preserveSourceData);
             OnKlvReady(entities);
         }
     }

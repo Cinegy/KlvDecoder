@@ -23,8 +23,8 @@ namespace Cinegy.KlvDecoder.TransportStream
         private Pes _currentKlvPes;
 
         public long LastPts { get; private set; }
-        
-        public KlvTsService TsService { get; set; } = new KlvTsService();
+
+        public KlvTsService TsService { get; private set; }
 
         public Descriptor CurrentKlvDescriptor { get; private set; }
 
@@ -37,13 +37,17 @@ namespace Cinegy.KlvDecoder.TransportStream
 
         public ushort DescriptorTag { get; private set; }
 
+        public bool PreserveSourceData { get; private set; }
+
         public KlvTsDecoder() { }
 
-        public KlvTsDecoder(int streamType, int descriptorTag, ushort programNumber = 0)
+        public KlvTsDecoder(int streamType, int descriptorTag, ushort programNumber = 0, bool preserveSourceData = false)
         {
             StreamType = (ushort)streamType;
             DescriptorTag = (ushort)descriptorTag;
             ProgramNumber = programNumber;
+            PreserveSourceData = preserveSourceData;
+            TsService = new KlvTsService(preserveSourceData);
         }
 
         public bool FindKlvService(TsDecoder.TransportStream.TsDecoder tsDecoder, out EsInfo esStreamInfo, out Descriptor klvDescriptor)
