@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text.Json.Serialization;
 
 namespace Cinegy.KlvDecoder.Entities
 {
@@ -7,7 +8,7 @@ namespace Cinegy.KlvDecoder.Entities
     {
         public UniversalLabelKlvEntity(byte[] data) : this(data,0) { }
 
-        public UniversalLabelKlvEntity(byte[] data, int offset)
+        public UniversalLabelKlvEntity(byte[] data, int offset, bool preserveSourceData = false)
         {
             if (data.Length - offset < 18)
                 throw new InvalidDataException("Provided KLV data does not meet minimum data size of at least 18");
@@ -55,7 +56,15 @@ namespace Cinegy.KlvDecoder.Entities
             Buffer.BlockCopy(data, dataPos, Value, 0, length);
             dataPos += length;
             ReadBytes = dataPos - offset;
+
+            if (preserveSourceData)
+            {
+                SourceData = new byte[data.Length];
+                Buffer.BlockCopy(data, offset, SourceData, 0, SourceData.Length);
+            }
         }
-        
+
+        [JsonIgnore]
+        public byte[] SourceData { get; internal set; }
     }
 }
