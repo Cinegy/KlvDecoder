@@ -7,3 +7,5 @@ packages
 project.lock.json
 /.vs
 .vs
+*.nupkg
+.gitlab-ci.yml

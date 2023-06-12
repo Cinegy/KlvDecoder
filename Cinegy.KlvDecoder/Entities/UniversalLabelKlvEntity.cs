@@ -1,4 +1,19 @@
-﻿using System;
+﻿/* Copyright 2022-2023 Cinegy GmbH.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+
+using System;
 using System.IO;
 using System.Text.Json.Serialization;
 
@@ -8,9 +23,11 @@ namespace Cinegy.KlvDecoder.Entities
     {
         public UniversalLabelKlvEntity(byte[] data) : this(data,0) { }
 
-        public UniversalLabelKlvEntity(byte[] data, int offset, bool preserveSourceData = false)
+        public UniversalLabelKlvEntity(byte[] data, int offset, int dataLen = 0, bool preserveSourceData = false)
         {
-            if (data.Length - offset < 18)
+            if (dataLen == 0) dataLen = data.Length;
+
+            if (dataLen - offset < 18)
                 throw new InvalidDataException("Provided KLV data does not meet minimum data size of at least 18");
 
             var dataPos = offset;
@@ -57,11 +74,10 @@ namespace Cinegy.KlvDecoder.Entities
             dataPos += length;
             ReadBytes = dataPos - offset;
 
-            if (preserveSourceData)
-            {
-                SourceData = new byte[data.Length];
-                Buffer.BlockCopy(data, offset, SourceData, 0, SourceData.Length);
-            }
+            if (!preserveSourceData) return;
+
+            SourceData = new byte[dataLen];
+            Buffer.BlockCopy(data, offset, SourceData, 0, dataLen);
         }
 
         [JsonIgnore]

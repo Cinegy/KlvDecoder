@@ -1,4 +1,4 @@
-﻿/* Copyright 2022 Cinegy GmbH.
+﻿/* Copyright 2022-2023 Cinegy GmbH.
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 
 using System;
 using Cinegy.TsDecoder.TransportStream;
+using Cinegy.TsDecoder.Descriptors;
 
 namespace Cinegy.KlvDecoder.TransportStream
 {
@@ -41,7 +42,7 @@ namespace Cinegy.KlvDecoder.TransportStream
 
         public KlvTsDecoder() { }
 
-        public KlvTsDecoder(int streamType, int descriptorTag, ushort programNumber = 0, bool preserveSourceData = false)
+        public KlvTsDecoder(int streamType, int descriptorTag, bool preserveSourceData = false, ushort programNumber = 0)
         {
             StreamType = (ushort)streamType;
             DescriptorTag = (ushort)descriptorTag;
@@ -88,7 +89,7 @@ namespace Cinegy.KlvDecoder.TransportStream
             }
         }
 
-        public void Setup(Descriptor klvDescriptor, short klvPid)
+        public void Setup(Descriptor klvDescriptor, ushort klvPid)
         {
             CurrentKlvDescriptor = klvDescriptor;
 
@@ -97,16 +98,19 @@ namespace Cinegy.KlvDecoder.TransportStream
             Setup(klvPid);
         }
 
-        public void Setup(short klvPid)
+        public void Setup(ushort klvPid)
         {
             TsService.KlvPid = klvPid;
         }
 
         public void AddPacket(TsPacket tsPacket, TsDecoder.TransportStream.TsDecoder tsDecoder = null)
         {
-            if (TsService == null || TsService.KlvPid == -1)
+            if (TsService == null || TsService.KlvPid == null)
             {
-                Setup(tsDecoder);
+                if (tsDecoder != null)
+                {
+                    Setup(tsDecoder);
+                }
             }
 
             if (tsPacket.Pid != TsService?.KlvPid) return;
@@ -116,10 +120,7 @@ namespace Cinegy.KlvDecoder.TransportStream
                 if (tsPacket.PesHeader.Pts > -1)
                     LastPts = tsPacket.PesHeader.Pts;
 
-                if (_currentKlvPes == null)
-                {
-                    _currentKlvPes = new Pes(tsPacket);
-                }
+                _currentKlvPes ??= new Pes(tsPacket);
             }
             else
             {

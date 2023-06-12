@@ -23,7 +23,7 @@ namespace Cinegy.KlvDecoder.Tests.Klv
         [Test]
         public void DecodeKlvData()
         {
-            var entities = KlvEntityFactory.GetEntitiesFromData(KlvDataSample1);
+            var entities = KlvEntityFactory.GetEntitiesFromData(KlvDataSample1, KlvDataSample1.Length);
 
             foreach (var entity in entities)
             {

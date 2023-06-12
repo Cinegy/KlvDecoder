@@ -1,4 +1,4 @@
-﻿/* Copyright 2022 Cinegy GmbH.
+﻿/* Copyright 2022-2023 Cinegy GmbH.
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 using System.Collections.Generic;
 using Cinegy.KlvDecoder.Entities;
 using Cinegy.TsDecoder.TransportStream;
+using Cinegy.TsDecoder.Descriptors;
 
 namespace Cinegy.KlvDecoder.TransportStream
 {
@@ -23,7 +24,7 @@ namespace Cinegy.KlvDecoder.TransportStream
     {
         private readonly KlvEntityFactory _klvEntityFactory;
 
-        public KlvTsService(bool preserveSourceData = false)
+        public KlvTsService(bool preserveSourceData = true)
         {
             _klvEntityFactory = new KlvEntityFactory(preserveSourceData);
             _klvEntityFactory.KlvEntitiesReady  += KlvEntityFactoryOnKlvEntitiesReady;
@@ -42,7 +43,7 @@ namespace Cinegy.KlvDecoder.TransportStream
         /// <summary>
         /// The TS Packet ID that has been selected as the elementary stream containing KLV data
         /// </summary>
-        public short KlvPid { get; set; } = -1;
+        public ushort? KlvPid { get; set; } = null;
 
         /// <summary>
         /// The Program Number ID to which the selected KLV PID belongs, if any

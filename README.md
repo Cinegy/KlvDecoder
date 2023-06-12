@@ -1,6 +1,6 @@
 # Cinegy KLV Decoder Library
 
-Use this library to decode KLV data from MPEG transport streams. The library takes a dependency on the Cinegy Transport Stream Decoder Library (Apache 2 licensed).;
+Use this library to decode KLV data from MPEG transport streams. The library takes a dependency on the Cinegy Transport Stream Decoder Library (Apache 2 licensed).
 
 ## How easy is it?
 

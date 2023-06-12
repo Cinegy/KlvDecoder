@@ -1,14 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
+﻿/* Copyright 2022-2023 Cinegy GmbH.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+
 using Cinegy.KlvDecoder.TransportStream;
 using Cinegy.TsDecoder.TransportStream;
+using System;
+using System.Buffers;
+using System.Collections.Generic;
 
 namespace Cinegy.KlvDecoder.Entities
 {
     public class KlvEntityFactory
     {
-        private readonly MetadataAccessUnitFactory _accessUnitFactory = new MetadataAccessUnitFactory();
-        private readonly bool _preserveSourceData = false;
+        private readonly MetadataAccessUnitFactory _accessUnitFactory = new();
+        private readonly bool _preserveSourceData;
 
         public KlvEntityFactory(bool preserveSourceData = false)
         {
@@ -24,14 +40,15 @@ namespace Cinegy.KlvDecoder.Entities
             const ushort klvMinimumSize = 6;
             var startOfKlvData = klvMinimumSize;
             
-            if (pes.OptionalPesHeader.MarkerBits == 2) //optional PES header exists - minimum length is 3
+            if (pes.OptionalPesHeader?.MarkerBits == 2) //optional PES header exists - minimum length is 3
             {
                 startOfKlvData += (ushort)(3 + pes.OptionalPesHeader.PesHeaderLength);
             }
 
-            var dataBuf = new byte[pes.PesPacketLength - startOfKlvData + klvMinimumSize];
-            
-            Buffer.BlockCopy(pes.Data, startOfKlvData, dataBuf, 0, dataBuf.Length);
+            var dataBufSize = pes.PesPacketLength - startOfKlvData + klvMinimumSize;
+            var dataBuf = ArrayPool<byte>.Shared.Rent(dataBufSize);
+
+            Buffer.BlockCopy(pes.Data, startOfKlvData, dataBuf, 0, dataBufSize);
 
             if (pes.StreamId == 0xFC)
             {
@@ -40,18 +57,19 @@ namespace Cinegy.KlvDecoder.Entities
             }
             else
             {
-                var entities = GetEntitiesFromData(dataBuf, _preserveSourceData);
+                var entities = GetEntitiesFromData(dataBuf, dataBufSize, _preserveSourceData);
                 OnKlvReady(entities);
             }
+            ArrayPool<byte>.Shared.Return(dataBuf);
         }
         
-        public static List<KlvEntity> GetEntitiesFromData(byte[] sourceData, bool preserveSourceData = false)
+        public static List<KlvEntity> GetEntitiesFromData(byte[] sourceData, int dataLen, bool preserveSourceData = true)
         {
             var klvMetadataList = new List<KlvEntity>();
             var sourceDataPos = 0;
-            while (sourceDataPos < sourceData.Length)
+            while (sourceDataPos < dataLen)
             {
-                var klvMetadata = new UniversalLabelKlvEntity(sourceData, sourceDataPos, preserveSourceData);
+                var klvMetadata = new UniversalLabelKlvEntity(sourceData, sourceDataPos, dataLen, preserveSourceData);
                 sourceDataPos += klvMetadata.ReadBytes;
                 klvMetadataList.Add(klvMetadata);
             }
@@ -59,11 +77,13 @@ namespace Cinegy.KlvDecoder.Entities
             return klvMetadataList;
         }
 
-        public static List<LocalSetKlvEntity> GetLocalSetEntitiesFromData(byte[] sourceData, int offset = 0)
+        public static List<LocalSetKlvEntity> GetLocalSetEntitiesFromData(byte[] sourceData, int dataLen = 0, int offset = 0)
         {
+            if(dataLen == 0) dataLen = sourceData.Length;
+
             var metadataList = new List<LocalSetKlvEntity>();
             var sourceDataPos = offset;
-            while (sourceDataPos < sourceData.Length)
+            while (sourceDataPos < dataLen)
             {
                 var klvMetadata = new LocalSetKlvEntity(sourceData, sourceDataPos);
                 sourceDataPos += klvMetadata.ReadBytes;
@@ -82,7 +102,7 @@ namespace Cinegy.KlvDecoder.Entities
 
         private void _accessUnitFactory_MetadataReady(object sender, MetadataAccessDataEventArgs args)
         {
-            var entities = GetEntitiesFromData(args.AccessUnit.Data, _preserveSourceData);
+            var entities = GetEntitiesFromData(args.AccessUnit.Data, args.AccessUnit.Data.Length, _preserveSourceData);
             OnKlvReady(entities);
         }
     }

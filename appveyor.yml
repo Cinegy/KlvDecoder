@@ -1,4 +1,4 @@
-version: 1.0.{build}
+version: 2.0.{build}-alpha
 branches:
   only:
   - trunk
@@ -23,8 +23,8 @@ after_build:
     7z a Cinegy.KlvDecoder-%APPVEYOR_REPO_BRANCH%-%APPVEYOR_BUILD_VERSION%-PDB.zip %APPVEYOR_BUILD_FOLDER%\Cinegy.KlvDecoder\bin
 
     appveyor PushArtifact Cinegy.KlvDecoder-%APPVEYOR_REPO_BRANCH%-%APPVEYOR_BUILD_VERSION%-PDB.zip
-deploy:
-- provider: NuGet
-  api_key:
-    secure: qeOuGvsrtZ2CDCuuOUr3b4h2F9n7clZtYypnvi7xA/EvSMF/w4/FKRtcff2mUb4m
-  skip_symbols: true
+# deploy:
+# - provider: NuGet
+#   api_key:
+#     secure: qeOuGvsrtZ2CDCuuOUr3b4h2F9n7clZtYypnvi7xA/EvSMF/w4/FKRtcff2mUb4m
+#   skip_symbols: true
