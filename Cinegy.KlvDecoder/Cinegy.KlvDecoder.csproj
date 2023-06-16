@@ -15,6 +15,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Cinegy.TsDecoder" Version="4.0.2-alpha" />
+    <PackageReference Include="Cinegy.TsDecoder" Version="4.0.3-alpha" />
   </ItemGroup>
 </Project>
